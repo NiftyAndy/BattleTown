@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, use } from 'react';
 import type { GTAG } from '@/app/api/ranking/route';
-import { MY_GTAGS } from '@/constants/gtags';
+import { MY_GTAGS, TIER_COUNT } from '@/constants/gtags';
 
 const RANK_API = '/api/ranking';
 
@@ -20,117 +20,78 @@ enum RARITY_FILTER {
 }
 
 enum CLASS {
-  swampy = 'Swampy',
-  kraken = 'Kraken',
-  ninetails = 'Ninetails',
-  toadz = 'Toadz',
-  mosura = 'Mosura',
   golem = 'Golem',
-  megajaw = 'Megajaw',
+  kraken = 'Kraken',
+  megajaw = 'MegaJaw',
+  mosura = 'Mosura',
+  ninetails = 'Ninetails',
+  swampy = 'Swampy',
+  toadz = 'Toadz',
+  none = 'None',
 }
 
-export default function Home() {
-  const [sorting, setSorting] = useState<SORT>(SORT.POPCORN);
-  const [rarityFilter, setRarityFilter] = useState<RARITY_FILTER>(
-    RARITY_FILTER.ALL
-  );
-  const [classFilter, setClassFilter] = useState<CLASS | string>('');
-  const [cachedGtags, setCachedGtags] = useState<GTAG[]>([]);
-  const [gtags, setGtags] = useState<GTAG[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+const highestClass = (gtag: GTAG): CLASS => {
+  const filteredClasses = Object.keys(CLASS).filter(c => c !== 'none');
+  const highest = filteredClasses.reduce((a, b) =>
+    Number(gtag[a as keyof GTAG]) > Number(gtag[b as keyof GTAG]) ? a : b
+  ) as keyof typeof CLASS;
+
+  if (gtag.total === 0) {
+    return CLASS.none;
+  }
+
+  return CLASS[highest];
+};
+
+interface RankTableProps {
+  classFilter: CLASS | string;
+  gtags: GTAG[];
+  isLoading: boolean;
+  rarityFilter: RARITY_FILTER;
+  setClassFilter: React.Dispatch<React.SetStateAction<CLASS | string>>;
+  setRarityFilter: React.Dispatch<React.SetStateAction<RARITY_FILTER>>;
+  setSorting: React.Dispatch<React.SetStateAction<SORT>>;
+  sorting: SORT;
+}
+
+const RankTable: React.FC<RankTableProps> = ({
+  classFilter,
+  gtags,
+  isLoading,
+  rarityFilter,
+  setClassFilter,
+  setRarityFilter,
+  setSorting,
+  sorting,
+}) => {
+  const [searchInput, setSearchInput] = useState<string>('');
   const [searchTokenId, setSearchTokenId] = useState<string>('');
-  const [searching, setSearching] = useState<boolean>(false);
   const tableRef = useRef<HTMLTableElement>(null);
 
   useEffect(() => {
-    const fetchGtags = async () => {
-      try {
-        setIsLoading(true);
-
-        let page = 1;
-        let allGtags: GTAG[] = [];
-
-        while (true) {
-          const response = await fetch(`${RANK_API}?page=${page}`);
-          const result = await response.json();
-          if (result.length === 0) break;
-
-          allGtags = [...allGtags, ...result];
-          page++;
-        }
-
-        setCachedGtags(allGtags);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching gtags:', error);
-        setIsLoading(false);
-      }
-    };
-
-    fetchGtags();
-  }, []);
-
-  useEffect(() => {
-    if (cachedGtags.length > 0) {
-      setIsLoading(true);
-
-      let sortedGtags: GTAG[] = [];
-      if (sorting === SORT.POPCORN) {
-        sortedGtags = [...cachedGtags].sort((a, b) => b.total - a.total);
-      } else if (sorting === SORT.BELLS) {
-        sortedGtags = [...cachedGtags].sort((a, b) => b.bell - a.bell);
-      }
-
-      let filteredGtags = sortedGtags;
-      if (rarityFilter !== RARITY_FILTER.ALL) {
-        filteredGtags = sortedGtags.filter(
-          gtag => gtag.rarity === rarityFilter
-        );
-      }
-
-      if (classFilter.length > 0) {
-        filteredGtags = filteredGtags.filter(
-          gtag => highestClass(gtag) === classFilter
-        );
-      }
-
-      setGtags(filteredGtags);
-      setIsLoading(false);
-    }
-  }, [sorting, rarityFilter, classFilter, cachedGtags]);
-
-  useEffect(() => {
-    if (searchTokenId && tableRef.current && searching) {
+    if (searchTokenId && tableRef.current) {
       const row = Array.from(tableRef.current.getElementsByTagName('tr')).find(
         tr => tr.id === searchTokenId
       );
       if (row) {
         row.scrollIntoView({ behavior: 'smooth' });
       }
-      setSearching(false);
     }
-  }, [searchTokenId, searching]);
+  }, [searchTokenId]);
 
   const handleSearch = () => {
-    setSearching(true);
+    setSearchTokenId(searchInput);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      setSearching(true);
+      setSearchTokenId(searchInput);
     }
   };
 
-  const highestClass = (gtag: GTAG): CLASS => {
-    return CLASS[
-      Object.keys(CLASS).reduce((a, b) =>
-        Number(gtag[a as keyof GTAG]) > Number(gtag[b as keyof GTAG]) ? a : b
-      ) as keyof typeof CLASS
-    ];
-  };
-
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
+    <div>
+      <h2 className="mb-4 text-2xl font-bold text-center text-white">Ranks</h2>
       <div className="flex justify-between mb-4 ml-auto">
         <select
           className="px-4 py-2 border border-gray-300 rounded-md mr-2 text-sm"
@@ -157,6 +118,7 @@ export default function Home() {
           onChange={e => setClassFilter(e.target.value as CLASS)}
         >
           <option value={''}>All Classes</option>
+          <option value={CLASS.none}>None</option>
           <option value={CLASS.golem}>Golem</option>
           <option value={CLASS.kraken}>Kraken</option>
           <option value={CLASS.megajaw}>MegaJaw</option>
@@ -168,8 +130,8 @@ export default function Home() {
           type="text"
           className="px-4 py-2 border border-gray-300 rounded-md mr-2 text-sm"
           placeholder="Search by Token ID"
-          value={searchTokenId}
-          onChange={e => setSearchTokenId(e.target.value)}
+          value={searchInput}
+          onChange={e => setSearchInput(e.target.value)}
           onKeyPress={handleKeyPress}
         />
         <button
@@ -251,6 +213,255 @@ export default function Home() {
           )}
         </tbody>
       </table>
+    </div>
+  );
+};
+
+type ClassTotals = {
+  name: string;
+  total: number;
+  epic: number;
+  rare: number;
+  uncommon: number;
+  common: number;
+};
+
+interface SummaryTableProps {
+  gtags: GTAG[];
+  isLoading: boolean;
+}
+
+const SummaryTable: React.FC<SummaryTableProps> = ({ isLoading, gtags }) => {
+  const [totals, setTotals] = useState<ClassTotals[]>([]);
+
+  useEffect(() => {
+    if (gtags.length > 0) {
+      const totals: ClassTotals[] = [];
+      Object.values(CLASS).forEach(c => {
+        const classGtags = gtags.filter(g => highestClass(g) === c);
+        const total = classGtags.length;
+        const epic = classGtags.filter(
+          g => g.rarity === RARITY_FILTER.EPIC
+        ).length;
+        const rare = classGtags.filter(
+          g => g.rarity === RARITY_FILTER.RARE
+        ).length;
+        const uncommon = classGtags.filter(
+          g => g.rarity === RARITY_FILTER.UNCOMMON
+        ).length;
+        const common = classGtags.filter(
+          g => g.rarity === RARITY_FILTER.COMMON
+        ).length;
+        totals.push({ name: c, total, epic, rare, uncommon, common });
+      });
+      // setTotals(totals);
+
+      const noneTotal: ClassTotals = totals.find(
+        t => t.name === CLASS.none
+      ) as ClassTotals;
+      const otherTotals: ClassTotals[] = totals.filter(
+        t => t.name !== CLASS.none
+      );
+
+      const updatedNoneTotal = {
+        ...noneTotal,
+        total:
+          TIER_COUNT.TOTAL -
+          otherTotals.reduce((sum, classTotals) => sum + classTotals.total, 0),
+        epic:
+          TIER_COUNT.EPIC -
+          otherTotals.reduce((sum, classTotals) => sum + classTotals.epic, 0),
+        rare:
+          TIER_COUNT.RARE -
+          otherTotals.reduce((sum, classTotals) => sum + classTotals.rare, 0),
+        uncommon:
+          TIER_COUNT.UNCOMMON -
+          otherTotals.reduce(
+            (sum, classTotals) => sum + classTotals.uncommon,
+            0
+          ),
+        common:
+          TIER_COUNT.COMMON -
+          otherTotals.reduce((sum, classTotals) => sum + classTotals.common, 0),
+      };
+
+      const updatedTotals: ClassTotals[] = [...otherTotals, updatedNoneTotal];
+
+      setTotals(updatedTotals);
+    }
+  }, [gtags]);
+
+  return (
+    <div className="mb-8">
+      <h2 className="mb-4 text-2xl font-bold text-center text-white">
+        Summary
+      </h2>
+      <table className="w-full bg-white border border-gray-300 rounded-lg shadow">
+        <thead>
+          <tr>
+            <th className="py-2 px-4 bg-gray-100 border-b">Class</th>
+            <th className="py-2 px-4 bg-gray-100 border-b">Total Count</th>
+            <th className="py-2 px-4 bg-gray-100 border-b">EPIC</th>
+            <th className="py-2 px-4 bg-gray-100 border-b">RARE</th>
+            <th className="py-2 px-4 bg-gray-100 border-b">UNCOMMON</th>
+            <th className="py-2 px-4 bg-gray-100 border-b">COMMON</th>
+          </tr>
+        </thead>
+        <tbody>
+          {isLoading ? (
+            <tr>
+              <td colSpan={6} className="py-8 text-center font-bold">
+                Loading...
+              </td>
+            </tr>
+          ) : (
+            <>
+              {totals.map((classTotals, index) => (
+                <tr
+                  key={`${classTotals.name}`}
+                  className={`${index % 2 === 0 ? 'bg-gray-50' : ''}`}
+                >
+                  <td className="py-2 px-4 border-b text-center font-bold">
+                    {classTotals.name}
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {classTotals.total.toLocaleString()}
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {classTotals.epic.toLocaleString()}
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {classTotals.rare.toLocaleString()}
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {classTotals.uncommon.toLocaleString()}
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {classTotals.common.toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+              {
+                <tr className="font-bold bg-gray-300">
+                  <td className="py-2 px-4 border-b text-center">Total</td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {totals
+                      .reduce((sum, classTotals) => sum + classTotals.total, 0)
+                      .toLocaleString()}
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {totals
+                      .reduce((sum, classTotals) => sum + classTotals.epic, 0)
+                      .toLocaleString()}
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {totals
+                      .reduce((sum, classTotals) => sum + classTotals.rare, 0)
+                      .toLocaleString()}
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {totals
+                      .reduce(
+                        (sum, classTotals) => sum + classTotals.uncommon,
+                        0
+                      )
+                      .toLocaleString()}
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {totals
+                      .reduce((sum, classTotals) => sum + classTotals.common, 0)
+                      .toLocaleString()}
+                  </td>
+                </tr>
+              }
+            </>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default function Home() {
+  const [sorting, setSorting] = useState<SORT>(SORT.POPCORN);
+  const [rarityFilter, setRarityFilter] = useState<RARITY_FILTER>(
+    RARITY_FILTER.ALL
+  );
+  const [classFilter, setClassFilter] = useState<CLASS | string>('');
+  const [cachedGtags, setCachedGtags] = useState<GTAG[]>([]);
+  const [gtags, setGtags] = useState<GTAG[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchGtags = async () => {
+      try {
+        setIsLoading(true);
+
+        let page = 1;
+        let allGtags: GTAG[] = [];
+
+        while (true) {
+          const response = await fetch(`${RANK_API}?page=${page}`);
+          const result = await response.json();
+          if (result.length === 0) break;
+
+          allGtags = [...allGtags, ...result];
+          page++;
+        }
+
+        setCachedGtags(allGtags);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching gtags:', error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchGtags();
+  }, []);
+
+  useEffect(() => {
+    if (cachedGtags.length > 0) {
+      setIsLoading(true);
+
+      let sortedGtags: GTAG[] = [];
+      if (sorting === SORT.POPCORN) {
+        sortedGtags = [...cachedGtags].sort((a, b) => b.total - a.total);
+      } else if (sorting === SORT.BELLS) {
+        sortedGtags = [...cachedGtags].sort((a, b) => b.bell - a.bell);
+      }
+
+      let filteredGtags = sortedGtags;
+      if (rarityFilter !== RARITY_FILTER.ALL) {
+        filteredGtags = sortedGtags.filter(
+          gtag => gtag.rarity === rarityFilter
+        );
+      }
+
+      if (classFilter.length > 0) {
+        filteredGtags = filteredGtags.filter(
+          gtag => highestClass(gtag) === classFilter
+        );
+      }
+
+      setGtags(filteredGtags);
+      setIsLoading(false);
+    }
+  }, [sorting, rarityFilter, classFilter, cachedGtags]);
+
+  return (
+    <main className="flex min-h-screen flex-col items-center p-24">
+      <SummaryTable gtags={gtags} isLoading={isLoading} />
+      <RankTable
+        classFilter={classFilter}
+        gtags={gtags}
+        isLoading={isLoading}
+        rarityFilter={rarityFilter}
+        setClassFilter={setClassFilter}
+        setRarityFilter={setRarityFilter}
+        setSorting={setSorting}
+        sorting={sorting}
+      />
     </main>
   );
 }
