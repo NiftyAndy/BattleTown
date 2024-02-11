@@ -1,35 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { ApiResponse, GTAG } from '@/types';
 
 const BASE_API = 'https://battle.town/api/gtags';
-
-export type GTAG = {
-  [key: string]: number | string | boolean | undefined;
-  id: string;
-  tokenId: number;
-  swampy: number;
-  kraken: number;
-  ninetails: number;
-  toadz: number;
-  mosura: number;
-  golem: number;
-  megajaw: number;
-  total: number;
-  createdAt: string;
-  updatedAt: string;
-  isDirtyS3: boolean;
-  isDirtyOpenSea: boolean;
-  isLocked: boolean;
-  bell: number;
-  position: string;
-  rarity: string;
-  tomoLevel?: number;
-};
-
-type API_RESPONSE = {
-  gtags: {
-    result: GTAG[];
-  };
-};
 
 // In-memory cache
 const cache: { [key: string]: { data: GTAG[]; timestamp: number } } = {};
@@ -50,7 +22,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const url = `${BASE_API}/ranking?rankBy=total&page=${page}`;
   const response = await fetch(url);
-  const data: API_RESPONSE = await response.json();
+  const data: ApiResponse = await response.json();
 
   // Add the necessary headers to allow CORS
   const headers = {
