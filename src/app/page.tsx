@@ -130,7 +130,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen flex-col items-center p-24">
       <div className="flex justify-between mb-4 ml-auto">
         <select
           className="px-4 py-2 border border-gray-300 rounded-md mr-2 text-sm"
@@ -196,7 +196,7 @@ export default function Home() {
         <tbody>
           {isLoading ? (
             <tr>
-              <td colSpan={6} className="py-4 text-center">
+              <td colSpan={6} className="py-8 text-center font-bold">
                 Loading...
               </td>
             </tr>
