@@ -54,16 +54,18 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
     const fetchCollection = async () => {
       try {
         const response = await fetch(COLLECTION_API);
-        const result: Collection = await response.json();
-        const { totalSupply, traitFrequencies } = result;
+        if (response.ok) {
+          const result: Collection = await response.json();
+          const { totalSupply, traitFrequencies } = result;
 
-        setTierCount({
-          TOTAL: totalSupply,
-          COMMON: traitFrequencies.Tier[0],
-          UNCOMMON: traitFrequencies.Tier[1],
-          RARE: traitFrequencies.Tier[2],
-          EPIC: traitFrequencies.Tier[3],
-        });
+          setTierCount({
+            TOTAL: totalSupply,
+            COMMON: traitFrequencies.Tier[0],
+            UNCOMMON: traitFrequencies.Tier[1],
+            RARE: traitFrequencies.Tier[2],
+            EPIC: traitFrequencies.Tier[3],
+          });
+        }
       } catch (error) {
         console.error('Error fetching collection:', error);
       }
