@@ -53,6 +53,7 @@ const RankTable: React.FC<RankTableProps> = ({
         >
           <option value={SORT.POPCORN}>Sort by Popcorn</option>
           <option value={SORT.BELLS}>Sort by Bells</option>
+          <option value={SORT.RARITY}>Sort by Rarity</option>
         </select>
         <select
           className="px-4 py-2 border border-gray-300 rounded-md mr-2 text-sm"

@@ -53,6 +53,16 @@ export default function App() {
         sortedGtags = [...cachedGtags].sort((a, b) => b.total - a.total);
       } else if (sorting === SORT.BELLS) {
         sortedGtags = [...cachedGtags].sort((a, b) => b.bell - a.bell);
+      } else if (sorting === SORT.RARITY) {
+        sortedGtags = [...cachedGtags].sort((a, b) => {
+          const rarityOrder = ['EPIC', 'RARE', 'UNCOMMON', 'COMMON'];
+          const aIndex = rarityOrder.indexOf(a.rarity);
+          const bIndex = rarityOrder.indexOf(b.rarity);
+
+          if (aIndex < bIndex) return -1;
+          if (aIndex > bIndex) return 1;
+          return b.total - a.total;
+        });
       }
 
       let filteredGtags = sortedGtags;

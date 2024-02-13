@@ -59,6 +59,7 @@ export const BELLS_MARKETPLACE = {
 export enum SORT {
   POPCORN = 'total',
   BELLS = 'bell',
+  RARITY = 'rarity',
 }
 
 export enum RARITY {

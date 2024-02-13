@@ -31,7 +31,6 @@ const SupplyTable: React.FC<SupplyTableProps> = ({
     ) {
       return Object.values(cornMarketplace).reduce((sum, c) => (sum += c), 0);
     }
-    console.log('classFilter', classFilter);
     return cornMarketplace[classFilter.toLowerCase()];
   }, [classFilter, cornMarketplace]);
 
