@@ -80,7 +80,11 @@ export default function App() {
         gtags={gtags}
         isLoading={isLoading}
       />
-      <SupplyTable gtags={gtags} isLoading={isLoading} />
+      <SupplyTable
+        classFilter={classFilter}
+        gtags={gtags}
+        isLoading={isLoading}
+      />
       <RankTable
         classFilter={classFilter}
         gtags={gtags}

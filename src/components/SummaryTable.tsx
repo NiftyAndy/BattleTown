@@ -56,7 +56,6 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
         const response = await fetch(SUPPLY_API);
         if (response.ok) {
           const result = await response.json();
-          console.log(result);
           setTierCount(result);
         }
       } catch (error) {

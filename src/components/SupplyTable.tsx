@@ -1,10 +1,19 @@
 'use client';
 
-import { useMemo } from 'react';
-import type { SupplyTableProps } from '@/types';
-import { POPCORN_MARKETPLACE, BELLS_MARKETPLACE } from '@/constants';
+import { useEffect, useMemo, useState } from 'react';
+import type { SupplyTableProps, MarketplaceResult } from '@/types';
+import { CLASS, MARKETPLACE_API, POPCORN_MARKETPLACE } from '@/constants';
 
-const SupplyTable: React.FC<SupplyTableProps> = ({ gtags, isLoading }) => {
+const SupplyTable: React.FC<SupplyTableProps> = ({
+  classFilter,
+  gtags,
+  isLoading,
+}) => {
+  const [cornMarketplace, setCornMarketplace] = useState<{
+    [key: string]: number;
+  }>(POPCORN_MARKETPLACE);
+  const [bellsMarketplace, setBellsMarketplace] = useState(0);
+
   const totalPopcornLoaded = useMemo(
     () => gtags.reduce((sum, g) => (sum += g.total), 0),
     [gtags]
@@ -14,14 +23,34 @@ const SupplyTable: React.FC<SupplyTableProps> = ({ gtags, isLoading }) => {
     [gtags]
   );
 
-  const totalPopcornMarketplace = useMemo(
-    () => Object.values(POPCORN_MARKETPLACE).reduce((sum, c) => (sum += c), 0),
-    []
-  );
-  const totalBellsMarketplace = useMemo(
-    () => Object.values(BELLS_MARKETPLACE).reduce((sum, c) => (sum += c), 0),
-    []
-  );
+  const totalPopcornMarketplace = useMemo(() => {
+    if (
+      classFilter === '' ||
+      classFilter === CLASS.even ||
+      classFilter === CLASS.none
+    ) {
+      return Object.values(cornMarketplace).reduce((sum, c) => (sum += c), 0);
+    }
+    console.log('classFilter', classFilter);
+    return cornMarketplace[classFilter.toLowerCase()];
+  }, [classFilter, cornMarketplace]);
+
+  useEffect(() => {
+    const fetchMarketplace = async () => {
+      try {
+        const response = await fetch(MARKETPLACE_API);
+        if (response.ok) {
+          const result: MarketplaceResult = await response.json();
+          setCornMarketplace(result.popcorn);
+          setBellsMarketplace(result.bells);
+        }
+      } catch (error) {
+        console.error('Error fetching collection:', error);
+      }
+    };
+
+    fetchMarketplace();
+  }, []);
 
   return (
     <div className="mb-8">
@@ -71,10 +100,10 @@ const SupplyTable: React.FC<SupplyTableProps> = ({ gtags, isLoading }) => {
                 </td>
                 <td className="py-2 px-4 border-b text-center">???</td>
                 <td className="py-2 px-4 border-b text-center">
-                  {totalBellsMarketplace.toLocaleString()}
+                  {bellsMarketplace.toLocaleString()}
                 </td>
                 <td className="font-bold py-2 px-4 border-b text-center">
-                  {(totalBellsLoaded + totalBellsMarketplace).toLocaleString()}
+                  {(totalBellsLoaded + bellsMarketplace).toLocaleString()}
                 </td>
               </tr>
             </>

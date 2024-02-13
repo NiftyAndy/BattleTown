@@ -1,11 +1,14 @@
 import type { ClassTotals } from '@/types';
 
 export const COLLECTION_API = '/api/collection';
+export const MARKETPLACE_API = '/api/marketplace';
 export const RANK_API = '/api/ranking';
 export const SUPPLY_API = '/api/supply';
 
 export const GTAG_CONTRACT = '0x2358693f4faec9d658bb97fc9cd8885f62105dc1';
 export const GTAG_IMPLEMENTATION = '0x9753166cc946c8c71b8b15bf71a0fc24f996b819';
+export const POPCORN_BELLS_CONTRACT =
+  '0x93553928ca776e2e1dc48059fddcc1c4d1060941';
 
 export const MY_GTAGS = [
   30577, 30587, 30566, 30572, 30686, 30570, 30579, 30568, 30583, 30588, 30576,

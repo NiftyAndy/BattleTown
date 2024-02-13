@@ -56,6 +56,7 @@ export interface SummaryTableProps {
 }
 
 export interface SupplyTableProps {
+  classFilter: CLASS | string;
   gtags: GTAG[];
   isLoading: boolean;
 }
@@ -116,4 +117,59 @@ export type Collection = {
 export type CollectionResponse = {
   success: boolean;
   collection: Collection;
+};
+
+export type MarketplaceToken = {
+  token_address: string;
+  token_id: string;
+  amount: string;
+  token_hash?: string;
+  block_number_minted?: string;
+  contract_type: string;
+  name?: string;
+  symbol?: string;
+  token_uri?: string;
+  metadata?: string;
+  last_token_uri_sync?: string;
+  last_metadata_sync?: string;
+  minter_address?: string;
+  possible_spam?: boolean;
+  verified_collection?: boolean;
+  normalized_metadata: {
+    name: string;
+    description?: string;
+    animation_url?: string;
+    external_link?: string;
+    image?: string;
+    attributes: {
+      trait_type: string;
+      value: string;
+      display_type?: string;
+      max_value?: string;
+      trait_count?: number;
+      order?: string;
+    }[];
+  };
+};
+
+export type MarketplaceResponse = {
+  raw: {
+    cursor?: string;
+    page?: number;
+    page_size?: number;
+    result: MarketplaceToken[];
+  };
+};
+
+export type MarketplaceResult = {
+  popcorn: {
+    golem: number;
+    kraken: number;
+    megajaw: number;
+    mosura: number;
+    ninetails: number;
+    swampy: number;
+    toadz: number;
+  };
+  bells: number;
 };
