@@ -20,7 +20,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
   }
 
-  const url = `${BASE_API}/ranking?rankBy=total&page=${page}`;
+  const url = `${BASE_API}/ranking?rankBy=bell&page=${page}`;
   const response = await fetch(url);
   const data: ApiResponse = await response.json();
 

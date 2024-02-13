@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { GTAG } from '@/types';
 import { CLASS, RANK_API, RARITY, SORT } from '@/constants';
-import { highestClass } from '@/utils';
+import { highestClass, sortByRarity, sortByTraits } from '@/utils';
 import RankTable from '@/components/RankTable';
 import SummaryTable from '@/components/SummaryTable';
 import SupplyTable from '@/components/SupplyTable';
@@ -54,15 +54,9 @@ export default function App() {
       } else if (sorting === SORT.BELLS) {
         sortedGtags = [...cachedGtags].sort((a, b) => b.bell - a.bell);
       } else if (sorting === SORT.RARITY) {
-        sortedGtags = [...cachedGtags].sort((a, b) => {
-          const rarityOrder = ['EPIC', 'RARE', 'UNCOMMON', 'COMMON'];
-          const aIndex = rarityOrder.indexOf(a.rarity);
-          const bIndex = rarityOrder.indexOf(b.rarity);
-
-          if (aIndex < bIndex) return -1;
-          if (aIndex > bIndex) return 1;
-          return b.total - a.total;
-        });
+        sortedGtags = [...cachedGtags].sort((a, b) => sortByRarity(a, b));
+      } else if (sorting === SORT.TRAITS) {
+        sortedGtags = [...cachedGtags].sort((a, b) => sortByTraits(a, b));
       }
 
       let filteredGtags = sortedGtags;

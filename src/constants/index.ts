@@ -56,10 +56,49 @@ export const BELLS_MARKETPLACE = {
   1000: 1000 * 60,
 };
 
+export const TRAIT_WEIGHTS = {
+  CLASS: {
+    GOLEM: 1430 / 10000,
+    KRAKEN: 1430 / 10000,
+    MEGAJAW: 1430 / 10000,
+    MOSURA: 1430 / 10000,
+    NINETAILS: 1430 / 10000,
+    SWAMPY: 1430 / 10000,
+    TOADZ: 1430 / 10000,
+  },
+  TIER: {
+    EPIC: 301 / 10000,
+    RARE: 689 / 10000,
+    UNCOMMON: 1411 / 10000,
+    COMMON: 7599 / 10000,
+  },
+  TOMO: {
+    T3: 179 / 10000,
+    T2: 364 / 10000,
+    T1: 752 / 10000,
+    NONE: 8705 / 10000,
+  },
+  POPCORN: {
+    EYES: 0.1,
+    FEET: 0.1,
+    HANDS: 0.1,
+    HEAD: 0.1,
+    MOUTH: 0.1,
+    ORIGIN: {
+      T4: (1430 * 0.1) / 10000,
+      T3: (1430 * 0.2) / 10000,
+      T2: (1430 * 0.3) / 10000,
+      T1: (1430 * 0.4) / 10000,
+    },
+  },
+  LOADOUT: {},
+};
+
 export enum SORT {
   POPCORN = 'total',
   BELLS = 'bell',
   RARITY = 'rarity',
+  TRAITS = 'traits',
 }
 
 export enum RARITY {

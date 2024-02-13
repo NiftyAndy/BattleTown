@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import type { RankTableProps } from '@/types';
 import { CLASS, MY_GTAGS, RARITY, SORT } from '@/constants';
-import { highestClass } from '@/utils';
+import { highestClass, calculateRangeRarity } from '@/utils';
 
 const RankTable: React.FC<RankTableProps> = ({
   classFilter,
@@ -54,6 +55,7 @@ const RankTable: React.FC<RankTableProps> = ({
           <option value={SORT.POPCORN}>Sort by Popcorn</option>
           <option value={SORT.BELLS}>Sort by Bells</option>
           <option value={SORT.RARITY}>Sort by Rarity</option>
+          <option value={SORT.TRAITS}>Sort by Traits</option>
         </select>
         <select
           className="px-4 py-2 border border-gray-300 rounded-md mr-2 text-sm"
@@ -108,6 +110,7 @@ const RankTable: React.FC<RankTableProps> = ({
             <th className="py-2 px-4 border-b">CLASS</th>
             <th className="py-2 px-4 border-b">TOTAL POPCORN</th>
             <th className="py-2 px-4 border-b">BELLS</th>
+            <th className="py-2 px-4 border-b">TOMO</th>
           </tr>
         </thead>
         <tbody>
@@ -162,6 +165,17 @@ const RankTable: React.FC<RankTableProps> = ({
                 </td>
                 <td className="py-2 px-4 border-b text-center">
                   {gtag.bell.toLocaleString()}
+                </td>
+                <td className="py-2 px-4 border-b text-center">
+                  {gtag.tomoLevel && gtag.tomoLevel > 0 ? (
+                    <Image
+                      src={`/tomo/L${gtag.tomoLevel}.svg`}
+                      alt={`tomo-${gtag.tomoLevel}`}
+                      width={24}
+                      height={18}
+                      style={{ margin: 'auto' }}
+                    />
+                  ) : null}
                 </td>
               </tr>
             ))
