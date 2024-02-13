@@ -52,17 +52,25 @@ const SupplyTable: React.FC<SupplyTableProps> = ({
     fetchMarketplace();
   }, []);
 
+  const estPopcornSupply = 100000000;
+  const popcornKnownSupply = totalPopcornLoaded + totalPopcornMarketplace;
+  const estBullsSupply = 350000;
+  const bellsKnownSupply = totalBellsLoaded + bellsMarketplace;
+
   return (
     <div className="mb-8">
-      <h2 className="mb-4 text-2xl font-bold text-center text-white">Supply</h2>
+      <h2 className="mb-4 text-2xl font-bold text-center text-white">
+        Popcorn & Bells Supply
+      </h2>
       <table className="w-full bg-white border border-gray-300 rounded-lg shadow">
         <thead>
           <tr className="font-bold bg-gray-300">
             <th className="py-2 px-4 border-b">TYPE</th>
             <th className="py-2 px-4 border-b">LOADED</th>
-            <th className="py-2 px-4 border-b">OFF-CHAIN</th>
             <th className="py-2 px-4 border-b">MARKETPLACE</th>
-            <th className="py-2 px-4 border-b">TOTAL COUNT</th>
+            <th className="py-2 px-4 border-b">KNOWN SUPPLY</th>
+            <th className="py-2 px-4 border-b">OFF-CHAIN</th>
+            <th className="py-2 px-4 border-b">ESTIMATED SUPPLY</th>
           </tr>
         </thead>
         <tbody>
@@ -81,14 +89,19 @@ const SupplyTable: React.FC<SupplyTableProps> = ({
                 <td className="py-2 px-4 border-b text-center">
                   {totalPopcornLoaded.toLocaleString()}
                 </td>
-                <td className="py-2 px-4 border-b text-center">???</td>
                 <td className="py-2 px-4 border-b text-center">
                   {totalPopcornMarketplace.toLocaleString()}
                 </td>
                 <td className="font-bold py-2 px-4 border-b text-center">
-                  {(
-                    totalPopcornLoaded + totalPopcornMarketplace
-                  ).toLocaleString()}
+                  {popcornKnownSupply.toLocaleString()}
+                </td>
+                <td className="py-2 px-4 border-b text-center">
+                  <span className="text-red-500">
+                    {(estPopcornSupply - popcornKnownSupply).toLocaleString()} ?
+                  </span>
+                </td>
+                <td className="font-bold py-2 px-4 border-b text-center">
+                  {estPopcornSupply.toLocaleString()}
                 </td>
               </tr>
               <tr>
@@ -98,12 +111,19 @@ const SupplyTable: React.FC<SupplyTableProps> = ({
                 <td className="py-2 px-4 border-b text-center">
                   {totalBellsLoaded.toLocaleString()}
                 </td>
-                <td className="py-2 px-4 border-b text-center">???</td>
                 <td className="py-2 px-4 border-b text-center">
                   {bellsMarketplace.toLocaleString()}
                 </td>
                 <td className="font-bold py-2 px-4 border-b text-center">
-                  {(totalBellsLoaded + bellsMarketplace).toLocaleString()}
+                  {bellsKnownSupply.toLocaleString()}
+                </td>
+                <td className="py-2 px-4 border-b text-center">
+                  <span className="text-red-500">
+                    {(estBullsSupply - bellsKnownSupply).toLocaleString()} ?
+                  </span>
+                </td>
+                <td className="font-bold py-2 px-4 border-b text-center">
+                  {estBullsSupply.toLocaleString()}
                 </td>
               </tr>
             </>

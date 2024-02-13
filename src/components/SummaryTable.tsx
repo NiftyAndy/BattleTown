@@ -69,7 +69,7 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
   return (
     <div className="mb-8">
       <h2 className="mb-4 text-2xl font-bold text-center text-white">
-        Summary
+        Grailed Class Summary
       </h2>
       <table className="w-full bg-white border border-gray-300 rounded-lg shadow">
         <thead>

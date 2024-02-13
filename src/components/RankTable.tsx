@@ -42,7 +42,9 @@ const RankTable: React.FC<RankTableProps> = ({
 
   return (
     <div>
-      <h2 className="mb-4 text-2xl font-bold text-center text-white">Ranks</h2>
+      <h2 className="mb-4 text-2xl font-bold text-center text-white">
+        Leaderboard
+      </h2>
       <div className="flex justify-between mb-4 ml-auto">
         <select
           className="px-4 py-2 border border-gray-300 rounded-md mr-2 text-sm"
