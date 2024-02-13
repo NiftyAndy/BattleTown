@@ -6,6 +6,7 @@ import { CLASS, RANK_API, RARITY, SORT } from '@/constants';
 import { highestClass } from '@/utils';
 import RankTable from '@/components/RankTable';
 import SummaryTable from '@/components/SummaryTable';
+import SupplyTable from '@/components/SupplyTable';
 
 export default function App() {
   const [sorting, setSorting] = useState<SORT>(SORT.POPCORN);
@@ -79,6 +80,7 @@ export default function App() {
         gtags={gtags}
         isLoading={isLoading}
       />
+      <SupplyTable gtags={gtags} isLoading={isLoading} />
       <RankTable
         classFilter={classFilter}
         gtags={gtags}

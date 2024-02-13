@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { ClassTotals, Collection, SummaryTableProps } from '@/types';
+import type { ClassTotals, SummaryTableProps } from '@/types';
 import {
   CLASS,
-  COLLECTION_API,
   INITIAL_CLASS_TOTALS,
+  SUPPLY_API,
   TIER_COUNT,
 } from '@/constants';
 import { calculateClassSums } from '@/utils';
@@ -53,18 +53,11 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
   useEffect(() => {
     const fetchCollection = async () => {
       try {
-        const response = await fetch(COLLECTION_API);
+        const response = await fetch(SUPPLY_API);
         if (response.ok) {
-          const result: Collection = await response.json();
-          const { totalSupply, traitFrequencies } = result;
-
-          setTierCount({
-            TOTAL: totalSupply,
-            COMMON: traitFrequencies.Tier[0],
-            UNCOMMON: traitFrequencies.Tier[1],
-            RARE: traitFrequencies.Tier[2],
-            EPIC: traitFrequencies.Tier[3],
-          });
+          const result = await response.json();
+          console.log(result);
+          setTierCount(result);
         }
       } catch (error) {
         console.error('Error fetching collection:', error);
@@ -83,11 +76,11 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
         <thead>
           <tr className="font-bold bg-gray-300">
             <th className="py-2 px-4 border-b">CLASS</th>
-            <th className="py-2 px-4 border-b">TOTAL COUNT</th>
             <th className="py-2 px-4 border-b">EPIC</th>
             <th className="py-2 px-4 border-b">RARE</th>
             <th className="py-2 px-4 border-b">UNCOMMON</th>
             <th className="py-2 px-4 border-b">COMMON</th>
+            <th className="py-2 px-4 border-b">TOTAL COUNT</th>
           </tr>
         </thead>
         <tbody>
@@ -108,9 +101,6 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
                     {classTotals.name}
                   </td>
                   <td className="py-2 px-4 border-b text-center">
-                    {classTotals.total.toLocaleString()}
-                  </td>
-                  <td className="py-2 px-4 border-b text-center">
                     {classTotals.epic.toLocaleString()}
                   </td>
                   <td className="py-2 px-4 border-b text-center">
@@ -122,13 +112,13 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
                   <td className="py-2 px-4 border-b text-center">
                     {classTotals.common.toLocaleString()}
                   </td>
+                  <td className="font-bold py-2 px-4 border-b text-center">
+                    {classTotals.total.toLocaleString()}
+                  </td>
                 </tr>
               ))}
               <tr className="font-bold bg-gray-300">
                 <td className="py-2 px-4 border-b text-center">Total Loaded</td>
-                <td className="py-2 px-4 border-b text-center">
-                  {totalLoaded.total.toLocaleString()}
-                </td>
                 <td className="py-2 px-4 border-b text-center">
                   {totalLoaded.epic.toLocaleString()}
                 </td>
@@ -141,15 +131,15 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
                 <td className="py-2 px-4 border-b text-center">
                   {totalLoaded.common.toLocaleString()}
                 </td>
+                <td className="font-bold py-2 px-4 border-b text-center">
+                  {totalLoaded.total.toLocaleString()}
+                </td>
               </tr>
               {classFilter === '' && (
                 <>
-                  <tr className="font-bold bg-gray-50">
-                    <td className="py-2 px-4 border-b text-center">
+                  <tr className="bg-gray-50">
+                    <td className="font-bold py-2 px-4 border-b text-center">
                       {totalUnloaded.name}
-                    </td>
-                    <td className="py-2 px-4 border-b text-center">
-                      {totalUnloaded.total.toLocaleString()}
                     </td>
                     <td className="py-2 px-4 border-b text-center">
                       {totalUnloaded.epic.toLocaleString()}
@@ -163,17 +153,13 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
                     <td className="py-2 px-4 border-b text-center">
                       {totalUnloaded.common.toLocaleString()}
                     </td>
-                  </tr>
-                  <tr className="font-bold">
-                    <td className="py-2 px-4 border-b text-center">
-                      Popcorn Never Loaded
+                    <td className="font-bold py-2 px-4 border-b text-center">
+                      {totalUnloaded.total.toLocaleString()}
                     </td>
-                    <td className="py-2 px-4 border-b text-center">
-                      {(
-                        tierCount.TOTAL -
-                        totalLoaded.total -
-                        totalUnloaded.total
-                      ).toLocaleString()}
+                  </tr>
+                  <tr>
+                    <td className="font-bold py-2 px-4 border-b text-center">
+                      Popcorn Never Loaded
                     </td>
                     <td className="py-2 px-4 border-b text-center">
                       {(
@@ -203,12 +189,16 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
                         totalUnloaded.common
                       ).toLocaleString()}
                     </td>
+                    <td className="font-bold py-2 px-4 border-b text-center">
+                      {(
+                        tierCount.TOTAL -
+                        totalLoaded.total -
+                        totalUnloaded.total
+                      ).toLocaleString()}
+                    </td>
                   </tr>
                   <tr className="font-bold bg-gray-300">
                     <td className="py-2 px-4 border-b text-center">Total</td>
-                    <td className="py-2 px-4 border-b text-center">
-                      {tierCount.TOTAL.toLocaleString()}
-                    </td>
                     <td className="py-2 px-4 border-b text-center">
                       {tierCount.EPIC.toLocaleString()}
                     </td>
@@ -220,6 +210,9 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
                     </td>
                     <td className="py-2 px-4 border-b text-center">
                       {tierCount.COMMON.toLocaleString()}
+                    </td>
+                    <td className="font-bold py-2 px-4 border-b text-center">
+                      {tierCount.TOTAL.toLocaleString()}
                     </td>
                   </tr>
                 </>

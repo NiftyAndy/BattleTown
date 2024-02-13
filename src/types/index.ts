@@ -55,6 +55,11 @@ export interface SummaryTableProps {
   isLoading: boolean;
 }
 
+export interface SupplyTableProps {
+  gtags: GTAG[];
+  isLoading: boolean;
+}
+
 export type Collection = {
   contractAddress: string;
   name: string;
