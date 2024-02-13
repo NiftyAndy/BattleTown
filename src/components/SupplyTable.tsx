@@ -60,7 +60,7 @@ const SupplyTable: React.FC<SupplyTableProps> = ({
           <tr className="font-bold bg-gray-300">
             <th className="py-2 px-4 border-b">TYPE</th>
             <th className="py-2 px-4 border-b">LOADED</th>
-            <th className="py-2 px-4 border-b">INVENTORY</th>
+            <th className="py-2 px-4 border-b">OFF-CHAIN</th>
             <th className="py-2 px-4 border-b">MARKETPLACE</th>
             <th className="py-2 px-4 border-b">TOTAL COUNT</th>
           </tr>
