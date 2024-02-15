@@ -23,10 +23,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   // const data = await response.json();
   // const abi: Abi = data.result;
 
+  const blockNumber = await client.getBlockNumber();
   const [uncommon, rare, epic] = (await client.readContract({
     address: GTAG_CONTRACT,
     abi: ABI,
     functionName: 'batchGetInventory',
+    blockNumber,
+    blockTag: 'latest',
   })) as Inventory;
 
   const data = {
