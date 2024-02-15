@@ -6,7 +6,7 @@ const BASE_API = 'https://battle.town/api/gtags';
 // In-memory cache
 const cache: { [key: string]: { data: GTAG[]; timestamp: number } } = {};
 const CACHE_KEY_PREFIX = 'apiCache_';
-const CACHE_EXPIRATION = 60 * 60 * 1000; // 1 hour in milliseconds
+const CACHE_EXPIRATION = 10 * 60 * 1000; // 10 minutes in milliseconds
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const searchParams = request.nextUrl.searchParams;

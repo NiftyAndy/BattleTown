@@ -5,8 +5,11 @@ import { GTAG_CONTRACT, GTAG_IMPLEMENTATION, TIER_TARGETS } from '@/constants';
 import { ABI } from '@/constants/abi';
 
 const client = createPublicClient({
+  cacheTime: 10_000,
   chain: mainnet,
-  transport: http(),
+  transport: http(
+    'https://eth-mainnet.g.alchemy.com/v2/zwtPQ5hcC2P2ZZspQxKNYxteLHxXQToZ'
+  ),
 });
 
 type Inventory = [bigint, bigint, bigint];
@@ -23,13 +26,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   // const data = await response.json();
   // const abi: Abi = data.result;
 
-  const blockNumber = await client.getBlockNumber();
+  const blockNumber = await client.getBlockNumber({
+    cacheTime: 10_000,
+  });
   const [uncommon, rare, epic] = (await client.readContract({
     address: GTAG_CONTRACT,
     abi: ABI,
     functionName: 'batchGetInventory',
     blockNumber,
-    blockTag: 'latest',
   })) as Inventory;
 
   const data = {
