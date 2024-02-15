@@ -79,6 +79,7 @@ const RankTable: React.FC<RankTableProps> = ({
           <option value={CLASS.golem}>{CLASS.golem}</option>
           <option value={CLASS.kraken}>{CLASS.kraken}</option>
           <option value={CLASS.megajaw}>{CLASS.megajaw}</option>
+          <option value={CLASS.mosura}>{CLASS.mosura}</option>
           <option value={CLASS.ninetails}>{CLASS.ninetails}</option>
           <option value={CLASS.swampy}>{CLASS.swampy}</option>
           <option value={CLASS.toadz}>{CLASS.toadz}</option>
